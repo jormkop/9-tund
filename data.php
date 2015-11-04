@@ -1,82 +1,94 @@
 <?php
 	require_once("functions.php");
-	//data.php
-	// siia p‰‰seb ligi sisseloginud kasutaja
-	//kui kasutaja ei ole sisseloginud,
-	//siis suuunan data.php lehele
+	
 	if(!isset($_SESSION["logged_in_user_id"])){
 		header("Location: login.php");
+		exit();
 	}
 	
-	//kasutaja tahab v‰lja logida
 	if(isset($_GET["logout"])){
-		//aadressireal on olemas muutuja logout
 		
-		//kustutame kıik session muutujad ja peatame sessiooni
 		session_destroy();
 		
 		header("Location: login.php");
 	}
+	//****************************************************//
+	//complete upload file php script, faili √ºleslaadimine//
+	//****************************************************//
+	$target_dir = "profile_pics/";
 	
-	$number_plate = $color = "";
-	$number_plate_error = $color_error = "";
-	
-	// keegi vajutas nuppu numbrim‰rgi lisamiseks
-	if(isset($_POST["add_plate"])){
-		
-		//echo $_SESSION["logged_in_user_id"];
-		
-		// valideerite v‰ljad
-		if ( empty($_POST["number_plate"]) ) {
-			$number_plate_error = "See v‰li on kohustuslik";
-		}else{
-			$number_plate = cleanInput($_POST["number_plate"]);
+	$target_file = $target_dir . basename($_FILES["fileToUpload"]["name"]);
+	$uploadOk = 1;
+	$imageFileType = pathinfo($target_file,PATHINFO_EXTENSION);
+	// Check if image file is a actual image or fake image
+	if(isset($_POST["submit"])) {
+		$check = getimagesize($_FILES["fileToUpload"]["tmp_name"]);
+		if($check !== false) {
+			echo "File is an image - " . $check["mime"] . ".";
+			$uploadOk = 1;
+		} else {
+			echo "File is not an image.";
+			$uploadOk = 0;
 		}
 		
-		if ( empty($_POST["color"]) ) {
-			$color_error = "See v‰li on kohustuslik";
-		}else{
-			$color = cleanInput($_POST["color"]);
+		// Check if file already exists
+		if (file_exists($target_file)) {
+			echo "Sorry, file already exists.";
+			$uploadOk = 0;
 		}
-		
-		// mılemad on kohustuslikud
-		if($color_error == "" && $number_plate_error == ""){
-			//salvestate ab'i fn kaudu addCarPlate
-			// message funktsioonist
-			$msg = addCarPlate($number_plate, $color);
-			
-			if($msg != ""){
-				//ınnestus, teeme inputi v‰ljad t¸hjaks
-				$number_plate = "";
-				$color = "";
-				
-				echo $msg;
-				
+		// Check file size
+		if ($_FILES["fileToUpload"]["size"] > 1024000) {
+			echo "Sorry, your file is too large.";
+			$uploadOk = 0;
+		}
+		// Allow certain file formats
+		if($imageFileType != "jpg" && $imageFileType != "png" && $imageFileType != "jpeg"
+		&& $imageFileType != "gif" ) {
+			echo "Sorry, only JPG, JPEG, PNG & GIF files are allowed.";
+			$uploadOk = 0;
+		}
+		// Check if $uploadOk is set to 0 by an error
+		if ($uploadOk == 0) {
+			echo "Sorry, your file was not uploaded.";
+		// if everything is ok, try to upload file
+		} else {
+			if (move_uploaded_file($_FILES["fileToUpload"]["tmp_name"], $target_file)) {
+				echo "The file ". basename( $_FILES["fileToUpload"]["name"]). " has been uploaded.";
+			} else {
+				echo "Sorry, there was an error uploading your file.";
 			}
-			
 		}
-		
-	}
+	} //endif post submit
 	
-	function cleanInput($data) {
-		$data = trim($data);
-		$data = stripslashes($data);
-		$data = htmlspecialchars($data);
-		return $data;
-	}
+	
+	
+	
+	
+	
 	
 ?>
+<?php if(isset($_SESSION["login_success_message"])): ?>
+	
+	<p style="color:green;" >
+		<?=$_SESSION["login_success_message"];?>
+	</p>
+
+<?php 
+	//kustutan selle s√µnumi p√§rast esimest n√§itamist
+	unset($_SESSION["login_success_message"]);
+	
+	endif; ?>
+
 <p>
 	Tere, <?=$_SESSION["logged_in_user_email"];?> 
-	<a href="?logout=1"> Logi v‰lja <a> 
+	<a href="?logout=1"> Logi v√§lja <a> 
 </p>
 
 
-<h2>Lisa autonumbrim‰rk</h2>
-<form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>" method="post" >
-	<label for="number_plate" >Auto numbrim‰rk</label><br>
-	<input id="number_plate" name="number_plate" type="text" value="<?php echo $number_plate; ?>"> <?php echo $number_plate_error; ?><br><br>
-	<label for="color">V‰rv</label><br>
-	<input id="color" name="color" type="text" value="<?php echo $color; ?>"> <?php echo $color_error; ?><br><br>
-	<input type="submit" name="add_plate" value="Salvesta">
+
+<h2>Profiilipilt</h2>
+<form action="data.php" method="post" enctype="multipart/form-data">
+    Lae √ºles pilt(1MB ja png,jpg,gif)
+    <input type="file" name="fileToUpload" id="fileToUpload">
+    <input type="submit" value="Upload Image" name="submit">
 </form>

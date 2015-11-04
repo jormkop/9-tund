@@ -1,19 +1,34 @@
-<?php 
-	
-	// Loon AB'i ühenduse
+<?php
+
+	require_once("user_class.php");
 	require_once("../config_global.php");
-	$database = "if15_romil_3";
+	
+	$database = "if15_Jork";
+	
+	session_start();
+	
+	$mysqli = new mysqli($servername, $server_username, $server_password, $database);
+	
+	//saadan Ã¼henduse classi ja loon uue classi
+	$User = new User($mysqli);
+	
+	//var_dump($User->connection);
+	
+	/*
+	// Loon AB'i Ã¼henduse
+	require_once("../config_global.php");
+	$database = "if15_Jork";
 	
 	//tekitatakse sessioon, mida hoitakse serveris,
-	// kõik session muutujad on kättesaadavad kuni viimase brauseriakna sulgemiseni
+	// kÃµik session muutujad on kÃ¤ttesaadavad kuni viimase brauseriakna sulgemiseni
 	session_start();
 	
 	
-	// võtab andmed ja sisestab ab'i
-	// võtame vastu 2 muutujat
+	// vÃµtab andmed ja sisestab ab'i
+	// vÃµtame vastu 2 muutujat
 	function createUser($create_email, $hash){
 		
-		// Global muutujad, et kätte saada config failist andmed
+		// Global muutujad, et kÃ¤tte saada config failist andmed
 		$mysqli = new mysqli($GLOBALS["servername"], $GLOBALS["server_username"], $GLOBALS["server_password"], $GLOBALS["database"]);
 		
 		$stmt = $mysqli->prepare("INSERT INTO user_sample (email, password) VALUES (?,?)");
@@ -34,7 +49,7 @@
 		$stmt->execute();
 		if($stmt->fetch()){
 			// ab'i oli midagi
-			echo "Email ja parool õiged, kasutaja id=".$id_from_db;
+			echo "Email ja parool Ãµiged, kasutaja id=".$id_from_db;
 			
 			// tekitan sessiooni muutujad
 			$_SESSION["logged_in_user_id"] = $id_from_db;
@@ -57,8 +72,8 @@
 		echo $name." ".$age;
 	}
 	
-	//hello("Romil", 5);
-	// kuigi muuutujad on erinevad jõuab väärtus kohale
+	//hello("kaido", 5);
+	// kuigi muuutujad on erinevad jÃµuab vÃ¤Ã¤rtus kohale
 	function addCarPlate($car_plate, $car_color) {
 		
 		$mysqli = new mysqli($GLOBALS["servername"], $GLOBALS["server_username"], $GLOBALS["server_password"], $GLOBALS["database"]);
@@ -66,17 +81,17 @@
 		$stmt = $mysqli->prepare("INSERT INTO car_plates (user_id, number_plate, color) VALUES (?,?,?)");
 		$stmt->bind_param("iss", $_SESSION["logged_in_user_id"], $car_plate, $car_color);
 		
-		//sõnum
+		//sÃµnum
 		$message = "";
 		
 		if($stmt->execute()){
-			// kui on tõene,
-			//siis INSERT õnnestus
+			// kui on tÃµene,
+			//siis INSERT Ãµnnestus
 			$message = "Sai edukalt lisatud";
 			 
 			
 		}else{
-			// kui on väärtus FALSE
+			// kui on vÃ¤Ã¤rtus FALSE
 			// siis kuvame errori
 			echo $stmt->error;
 			
@@ -91,5 +106,5 @@
 		
 		
 	}
-	
+	*/
 ?>
